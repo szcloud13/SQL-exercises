@@ -1,0 +1,31 @@
+
+select m.title, m.year, m.content_rating, m.lang, m.imdb_score, m.num_voted_users, g.movie_id, count(*)
+from
+(select * from genre g1 where g1.genre ~* '(Action|Sci-fi|Adventure)'
+    group by g1.movie_id, g1.genre
+    order by g1.movie_id)
+as g
+join(
+    select m.id, m.title, m.year, m.content_rating, m.lang, r.imdb_score, r.num_voted_users
+    from movie m
+        inner join rating r on (r.movie_id = m.id)
+    where m.year >= 2005 and m.year <= 2005
+    order by r.imdb_score desc, r.num_voted_users desc
+) as m
+on (m.id = g.movie_id)
+group by m.title, m.year, m.content_rating, m.lang, m.imdb_score, m.num_voted_users, g.movie_id
+having count(*) = 3
+order by m.imdb_score, m.num_voted_users
+
+
+
+
+
+
+create view task_c as
+    select m.title, m.year, m.content_rating, m.lang, r.imdb_score, r.num_voted_users
+    from eligible e
+        inner join movie m on (m.id = e.movie_id) and (m.year <= 2005 and m.year >= 2005)
+        inner join rating r on (r.movie_id = m.id)
+    where e.count = 3
+    order by r.imdb_score desc limit 10; // limit = K

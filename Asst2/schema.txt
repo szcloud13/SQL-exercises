@@ -1,0 +1,139 @@
+     Table "public.acting"
+  Column  |  Type   | Modifiers
+----------+---------+-----------
+ movie_id | integer | not null
+ actor_id | integer | not null
+Indexes:
+    "acting_pkey" PRIMARY KEY, btree (movie_id, actor_id)
+Foreign-key constraints:
+    "acting_actor_id_fkey" FOREIGN KEY (actor_id) REFERENCES actor(id)
+
+
+*****************************************************************************************
+                                     Table "public.actor"
+     Column     |          Type          |                     Modifiers
+----------------+------------------------+----------------------------------------------------
+ id             | integer                | not null default nextval('actor_id_seq'::regclass)
+ name           | character varying(128) | not null
+ facebook_likes | positiveint            |
+Indexes:
+    "actor_pkey" PRIMARY KEY, btree (id)
+    "actor_name_key" UNIQUE CONSTRAINT, btree (name)
+Referenced by:
+    TABLE "acting" CONSTRAINT "acting_actor_id_fkey" FOREIGN KEY (actor_id) REFERENCES actor(id)
+
+
+*****************************************************************************************
+
+    Sequence "public.actor_id_seq"
+Column     |  Type   |        Value
+---------------+---------+---------------------
+sequence_name | name    | actor_id_seq
+last_value    | bigint  | 6237
+start_value   | bigint  | 1
+increment_by  | bigint  | 1
+max_value     | bigint  | 9223372036854775807
+min_value     | bigint  | 1
+cache_value   | bigint  | 1
+log_cnt       | bigint  | 0
+is_cycled     | boolean | f
+is_called     | boolean | t
+Owned by: public.actor.id
+
+
+*****************************************************************************************
+
+Table "public.director"
+Column     |          Type          |                       Modifiers
+----------------+------------------------+-------------------------------------------------------
+id             | integer                | not null default nextval('director_id_seq'::regclass)
+name           | character varying(128) | not null
+facebook_likes | positiveint            |
+Indexes:
+"director_pkey" PRIMARY KEY, btree (id)
+"director_name_key" UNIQUE CONSTRAINT, btree (name)
+Referenced by:
+TABLE "movie" CONSTRAINT "movie_director_id_fkey" FOREIGN KEY (director_id) REFERENCES director(id)
+
+*****************************************************************************************
+
+Sequence "public.director_id_seq"
+Column     |  Type   |        Value
+---------------+---------+---------------------
+sequence_name | name    | director_id_seq
+last_value    | bigint  | 2392
+start_value   | bigint  | 1
+increment_by  | bigint  | 1
+max_value     | bigint  | 9223372036854775807
+min_value     | bigint  | 1
+cache_value   | bigint  | 1
+log_cnt       | bigint  | 0
+is_cycled     | boolean | f
+is_called     | boolean | t
+Owned by: public.director.id
+
+
+*****************************************************************************************
+
+Table "public.genre"
+Column  |   Type    | Modifiers
+----------+-----------+-----------
+movie_id | integer   | not null
+genre    | genretype | not null
+Indexes:
+"genre_pkey" PRIMARY KEY, btree (movie_id, genre)
+Foreign-key constraints:
+"genre_movie_id_fkey" FOREIGN KEY (movie_id) REFERENCES movie(id)
+
+*****************************************************************************************
+
+Table "public.keyword"
+Column  |          Type          | Modifiers
+----------+------------------------+-----------
+movie_id | integer                |
+keyword  | character varying(256) | not null
+
+
+*****************************************************************************************
+
+Table "public.movie"
+Column     |          Type          | Modifiers
+----------------+------------------------+-----------
+id             | integer                | not null
+title          | character varying(256) | not null
+year           | yeartype               |
+content_rating | contentratingtype      |
+duration       | positiveint            |
+lang           | languagetype           |
+country        | countrytype            |
+gross          | amounttype             |
+budget         | amounttype             |
+director_id    | integer                |
+Indexes:
+"movie_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+"movie_director_id_fkey" FOREIGN KEY (director_id) REFERENCES director(id)
+Referenced by:
+TABLE "genre" CONSTRAINT "genre_movie_id_fkey" FOREIGN KEY (movie_id) REFERENCES movie(id)
+TABLE "rating" CONSTRAINT "rating_movie_id_fkey" FOREIGN KEY (movie_id) REFERENCES movie(id)
+
+
+*****************************************************************************************
+
+Table "public.rating"
+Column           |     Type     | Modifiers
+---------------------------+--------------+-----------
+movie_id                  | integer      | not null
+num_critic_for_reviews    | positiveint  |
+num_user_for_reviews      | positiveint  |
+num_voted_users           | positiveint  |
+movie_facebook_likes      | positiveint  |
+cast_total_facebook_likes | positiveint  |
+imdb_score                | numeric(3,1) |
+Indexes:
+"rating_pkey" PRIMARY KEY, btree (movie_id)
+Foreign-key constraints:
+"rating_movie_id_fkey" FOREIGN KEY (movie_id) REFERENCES movie(id)
+
+
+*****************************************************************************************

@@ -1,0 +1,75 @@
+#!/usr/bin/php
+<?php
+
+//
+// pg - print all PG and PG-13 movies of a given year
+//
+
+// include the common PHP code file
+require("a2.php");
+
+
+
+// PROGRAM BODY BEGINS
+
+$usage = "Usage: $argv[0] Actor Name";
+$db = dbConnect(DB_CONNECTION);
+
+// Check arguments
+if (count($argv) < 2 || !is_string($argv[1])) exit();
+
+// Get the return results
+$search = '%'.$argv[1].'%';
+$q =
+"select m.title, m.year, m.content_rating, r.imdb_score, g.genre
+from movie m
+        inner join rating r on (r.movie_id = m.id)
+        inner join genre g on (g.movie_id = m.id)
+where m.title ilike %s
+order by m.year, r.imdb_score desc, m.title, g.genre";
+
+$r = dbQuery($db, mkSQL($q, $search));
+if (dbNResults($r) == 0) exit("no search results\n");
+
+// Iterate through the results and print
+$out_array = array();
+$genre_array = array();
+$index = 1;
+while ($t = dbNext($r)){
+        $title = $t["title"];
+        if(!array_key_exists($t["title"], $out_array)){
+	    if(empty($t["year"])){
+
+		$out_array[$title] = sprintf(" %s (%s, %s) ", $t["title"], $t["content_rating"], $t["imdb_score"]);
+	    }else{
+            	$out_array[$title] = sprintf(" %s (%s, %s, %s) ", $t["title"], $t["year"], $t["content_rating"], $t["imdb_score"]);
+            }
+	    $genre_array[$title] = ("[" . $t["genre"]);
+        }else{
+            $genre_array[$title] .= ("," . $t["genre"]);
+        }
+	
+}
+
+$numKeys = count($out_array);
+
+foreach ($out_array as $key => $value) {
+    $out = $index . "." . $out_array[$key];
+    $out .= ($genre_array[$key]."]");
+    if($index != $numKeys){
+	 echo "$out\n";
+    }else{
+	echo "$out";
+    }
+    $index++;
+}
+
+
+
+
+
+
+
+
+?>
+
